@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><!--<resources>-->
+<!--<external-path name="files_root" path="Android/data/com/pgyersdk" />-->
+<!--<external-path name="external_storage_root" path="."/>-->
+<!--</resources>-->
+<resources>
+    <paths>
+        <root-path
+            name="file_path"
+            path="" />
+    </paths>
+    <paths>
+        <!-- /storage/emulated/0/Download/${applicationId}/.beta/apk-->
+        <!--<external-path name="beta_external_path" path="Download/"/>-->
+        <!--/storage/emulated/0/Android/data/${applicationId}/files/apk/-->
+        <!--<external-path name="beta_external_files_path" path="Android/data/"/>-->
+        <!--external-path  相当于 Environment.getExternalStorageDirectory() /storage/emulated/0/UOperation/CAMERA_PHOTO_PATH -->
+        <!--<external-path  name="image_path" path="UOperation/CAMERA_PHOTO_PATH"/>-->
+        <!--可以随便访问外sd所有文件夹-->
+        <external-path
+            name="mypath"
+            path="" />
+
+    </paths>
+</resources>

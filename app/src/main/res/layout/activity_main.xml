@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.main.drawtest.CustomImageView
+        android:id="@+id/iv_photo"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        >
+    </com.main.drawtest.CustomImageView>
+
+    <RelativeLayout
+        android:background="#CCCCCC"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_import"
+            android:layout_marginTop="2dp"
+            android:text="导入图片"
+            android:background="#547D1B"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </Button>
+
+        <Button
+            android:id="@+id/btn_mark"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/btn_import"
+            android:layout_marginLeft="20dp"
+            android:text="开始标注"
+            android:background="#547D1B"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </Button>
+
+        <Button
+            android:id="@+id/btn_change_mode"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/btn_mark"
+            android:layout_marginLeft="20dp"
+            android:text="模式转换"
+            android:background="#547D1B"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </Button>
+
+        <TextView
+            android:id="@+id/tv_info"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="5dp"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </TextView>
+
+    </RelativeLayout>
+
+</LinearLayout>

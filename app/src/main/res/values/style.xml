@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="FileGridViewBase">
+        <item name="android:columnWidth">50dp</item>
+        <item name="android:horizontalSpacing">2dp</item>
+        <item name="android:numColumns">3</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:verticalSpacing">2dp</item>
+    </style>
+
+    <style name="UoperationMatisse" parent="Matisse.Zhihu">
+        <item name="colorPrimary">#20B2AA</item>
+        <item name="colorPrimaryDark">#008d7c</item>
+        <item name="colorAccent">#20B2AA</item>
+        <item name="bottomToolbar.apply.textColor">#008d7c</item>
+    </style>
+</resources>
