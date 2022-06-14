@@ -4,15 +4,56 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.main.drawtest.CustomImageView
-        android:id="@+id/iv_photo"
-        android:layout_weight="1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        >
-    </com.main.drawtest.CustomImageView>
 
     <RelativeLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <com.main.drawtest.CustomImageView
+            android:id="@+id/iv_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+        </com.main.drawtest.CustomImageView>
+
+        <RelativeLayout
+            android:id="@+id/rl_point_info"
+            android:layout_alignParentRight="true"
+            android:background="#90000000"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            >
+            <TextView
+                android:id="@+id/tv_title"
+                android:text="标注点列表"
+                android:background="#90000000"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:layout_centerHorizontal="true"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:gravity="center"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content">
+            </TextView>
+
+            <ListView
+                android:id="@+id/lv_points"
+                android:background="#90000000"
+                android:layout_marginTop="2dp"
+                android:layout_below="@id/tv_title"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                >
+            </ListView>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_tools_bar"
         android:background="#CCCCCC"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -20,42 +61,59 @@
         <Button
             android:id="@+id/btn_import"
             android:layout_marginTop="2dp"
-            android:text="导入图片"
+            android:text="导入"
             android:background="#547D1B"
-            android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_marginLeft="5dp"
+            android:layout_centerVertical="true"
+            android:layout_width="60dp"
+            android:layout_height="40dp">
         </Button>
 
         <Button
             android:id="@+id/btn_mark"
             android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/btn_import"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="5dp"
             android:text="开始标注"
             android:background="#547D1B"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_centerVertical="true"
+            android:layout_width="70dp"
+            android:layout_height="40dp">
         </Button>
 
         <Button
             android:id="@+id/btn_change_mode"
             android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/btn_mark"
-            android:layout_marginLeft="20dp"
-            android:text="模式转换"
+            android:layout_marginLeft="5dp"
+            android:text="模式"
             android:background="#547D1B"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_centerVertical="true"
+            android:layout_width="70dp"
+            android:layout_height="40dp">
+        </Button>
+
+        <Button
+            android:id="@+id/btn_click"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/btn_change_mode"
+            android:layout_marginLeft="5dp"
+            android:text="移动"
+            android:background="#547D1B"
+            android:layout_centerVertical="true"
+            android:layout_width="70dp"
+            android:layout_height="40dp">
         </Button>
 
         <TextView
             android:id="@+id/tv_info"
             android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@id/btn_click"
             android:layout_marginRight="5dp"
+            android:textColor="@color/black"
             android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_width="80dp"
+            android:layout_height="40dp">
         </TextView>
 
     </RelativeLayout>

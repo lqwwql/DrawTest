@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,16 +32,21 @@ import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
 
     private final static int PHOTO_REQUEST_GALLERY = 10011;
     private CustomImageView imageView;
-    private Button btnMark,btnChangeMode;
+    private Button btnMark, btnChangeMode;
     private boolean isMarking = false;
     private TextView tvInfo;
     private int mode = 1;
+    private ListView lvPoints;
+    private PointsAdapter pointsAdapter;
+    private List<DimensionPoint> dimensionPointList;
+    private RelativeLayout rlPointInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +60,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         imageView = findViewById(R.id.iv_photo);
         btnMark = findViewById(R.id.btn_mark);
         btnChangeMode = findViewById(R.id.btn_change_mode);
+        lvPoints = findViewById(R.id.lv_points);
+        rlPointInfo = findViewById(R.id.rl_point_info);
+        dimensionPointList = new ArrayList<>();
+        pointsAdapter = new PointsAdapter(dimensionPointList, this);
+        lvPoints.setAdapter(pointsAdapter);
 
         findViewById(R.id.btn_import).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
-        btnChangeMode.setText("模式"+mode);
+        btnChangeMode.setText("模式" + mode);
         btnChangeMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 } else {
                     mode = 1;
                 }
-                btnChangeMode.setText("模式"+mode);
+                btnChangeMode.setText("模式" + mode);
                 imageView.setMode(mode);
             }
         });
@@ -99,10 +111,31 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
+        findViewById(R.id.btn_click).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         imageView.setDrawInfoListener(new CustomImageView.DrawInfoListener() {
             @Override
-            public void onDraw(String info) {
+            public void onDraw(String info, List<DimensionPoint> data) {
                 tvInfo.setText(info);
+                dimensionPointList.clear();
+                if (data == null || data.isEmpty()) {
+                    rlPointInfo.setVisibility(View.GONE);
+                } else {
+                    rlPointInfo.setVisibility(View.VISIBLE);
+                    dimensionPointList.addAll(data);
+                }
+                pointsAdapter.notifyDataSetChanged();
+            }
+        });
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "click view , hide bar", Toast.LENGTH_SHORT).show();
             }
         });
     }
