@@ -44,22 +44,18 @@ public class PointsAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) view.getTag();
         }
         viewHolder.pointNum.setText("标注点" + (i + 1));
-        viewHolder.leftTopX.setText(String.valueOf(points.get(i).getLeftTopX()));
-        viewHolder.leftTopY.setText(String.valueOf(points.get(i).getLeftTopY()));
-        viewHolder.rightBottomX.setText(String.valueOf(points.get(i).getRightBottomX()));
-        viewHolder.rightBottomY.setText(String.valueOf(points.get(i).getRightBottomY()));
+        viewHolder.leftTop.setText("LeftTop[" + points.get(i).getLeftTopX() + "," + points.get(i).getLeftTopY() + "]");
+        viewHolder.rightBottom.setText("RightBottom[" + points.get(i).getRightBottomX() + "," + points.get(i).getRightBottomY() + "]");
         return view;
     }
 
     public class ViewHolder {
-        public TextView pointNum, leftTopX, leftTopY, rightBottomX, rightBottomY;
+        public TextView pointNum, leftTop, rightBottom;
 
         public ViewHolder(View view) {
             this.pointNum = view.findViewById(R.id.tv_point_num);
-            this.leftTopX = view.findViewById(R.id.tv_left_top_x);
-            this.leftTopY = view.findViewById(R.id.tv_left_top_y);
-            this.rightBottomX = view.findViewById(R.id.tv_right_bottom_x);
-            this.rightBottomY = view.findViewById(R.id.tv_right_bottom_y);
+            this.leftTop = view.findViewById(R.id.tv_left_top);
+            this.rightBottom = view.findViewById(R.id.tv_right_bottom);
         }
     }
 }

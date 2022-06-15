@@ -46,7 +46,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     private ListView lvPoints;
     private PointsAdapter pointsAdapter;
     private List<DimensionPoint> dimensionPointList;
+    private List<DimensionPoint> testPointList;
     private RelativeLayout rlPointInfo;
+    private float mScale = 2f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         lvPoints = findViewById(R.id.lv_points);
         rlPointInfo = findViewById(R.id.rl_point_info);
         dimensionPointList = new ArrayList<>();
+        testPointList = new ArrayList<>();
         pointsAdapter = new PointsAdapter(dimensionPointList, this);
         lvPoints.setAdapter(pointsAdapter);
 
@@ -82,17 +85,20 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
-        btnChangeMode.setText("模式" + mode);
+//        btnChangeMode.setText("模式" + mode);
         btnChangeMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mode == 1) {
-                    mode = 2;
-                } else {
-                    mode = 1;
-                }
-                btnChangeMode.setText("模式" + mode);
-                imageView.setMode(mode);
+//                if (mode == 1) {
+//                    mode = 2;
+//                } else {
+//                    mode = 1;
+//                }
+//                btnChangeMode.setText("模式" + mode);
+//                imageView.setMode(mode);
+//                mScale += 0.5f;
+//                imageView.scale(mScale);
+                imageView.drawNewRect(testPointList);
             }
         });
 
@@ -114,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         findViewById(R.id.btn_click).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+//                imageView.translate(100, 100);
+                imageView.revokeRect();
             }
         });
 
@@ -128,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 } else {
                     rlPointInfo.setVisibility(View.VISIBLE);
                     dimensionPointList.addAll(data);
+                    testPointList.addAll(data);
                 }
                 pointsAdapter.notifyDataSetChanged();
             }
