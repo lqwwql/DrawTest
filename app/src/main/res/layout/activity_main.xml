@@ -83,11 +83,11 @@
         </Button>
 
         <Button
-            android:id="@+id/btn_change_mode"
+            android:id="@+id/btn_click1"
             android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/btn_mark"
             android:layout_marginLeft="5dp"
-            android:text="缩放"
+            android:text="点击1"
             android:background="#547D1B"
             android:layout_centerVertical="true"
             android:layout_width="70dp"
@@ -95,28 +95,69 @@
         </Button>
 
         <Button
-            android:id="@+id/btn_click"
+            android:id="@+id/btn_click2"
             android:layout_marginTop="2dp"
-            android:layout_toRightOf="@id/btn_change_mode"
+            android:layout_toRightOf="@id/btn_click1"
             android:layout_marginLeft="5dp"
-            android:text="移动"
+            android:text="点击2"
             android:background="#547D1B"
             android:layout_centerVertical="true"
             android:layout_width="70dp"
             android:layout_height="40dp">
         </Button>
 
-        <TextView
-            android:id="@+id/tv_info"
-            android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@id/btn_click"
-            android:layout_marginRight="5dp"
-            android:textColor="@color/black"
+        <CheckBox
+            android:id="@+id/cb_scale"
+            android:layout_toRightOf="@id/btn_click2"
             android:layout_centerVertical="true"
-            android:layout_width="80dp"
-            android:layout_height="40dp">
-        </TextView>
+            android:text="缩放"
+            android:checked="true"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
+        </CheckBox>
+
+        <CheckBox
+            android:id="@+id/cb_translate"
+            android:layout_toRightOf="@id/cb_scale"
+            android:layout_centerVertical="true"
+            android:text="移动"
+            android:checked="true"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </CheckBox>
+
+        <EditText
+            android:id="@+id/et_trans_x"
+            android:layout_toRightOf="@id/cb_translate"
+            android:textColor="@color/black"
+            android:layout_width="50dp"
+            android:text="100"
+            android:layout_height="wrap_content">
+
+        </EditText>
+
+        <EditText
+            android:id="@+id/et_trans_y"
+            android:layout_toRightOf="@id/et_trans_x"
+            android:text="100"
+            android:textColor="@color/black"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content">
+
+        </EditText>
+        <EditText
+            android:id="@+id/et_scale"
+            android:layout_toRightOf="@id/et_trans_y"
+            android:textColor="@color/black"
+            android:text="1.5"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content">
+
+        </EditText>
     </RelativeLayout>
 
 </LinearLayout>

@@ -16,6 +16,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -41,13 +44,13 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     private CustomImageView imageView;
     private Button btnMark, btnChangeMode;
     private boolean isMarking = false;
-    private TextView tvInfo;
     private int mode = 1;
     private ListView lvPoints;
     private PointsAdapter pointsAdapter;
     private List<DimensionPoint> dimensionPointList;
     private List<DimensionPoint> testPointList;
     private RelativeLayout rlPointInfo;
+    private EditText etTransX, etTransY, etScale;
     private float mScale = 2f;
 
     @Override
@@ -58,12 +61,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        tvInfo = findViewById(R.id.tv_info);
         imageView = findViewById(R.id.iv_photo);
         btnMark = findViewById(R.id.btn_mark);
-        btnChangeMode = findViewById(R.id.btn_change_mode);
+        btnChangeMode = findViewById(R.id.btn_click1);
         lvPoints = findViewById(R.id.lv_points);
-        rlPointInfo = findViewById(R.id.rl_point_info);
+        etTransX = findViewById(R.id.et_trans_x);
+        etTransY = findViewById(R.id.et_trans_y);
+        etScale = findViewById(R.id.et_scale);
+
         dimensionPointList = new ArrayList<>();
         testPointList = new ArrayList<>();
         pointsAdapter = new PointsAdapter(dimensionPointList, this);
@@ -97,38 +102,58 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 //                btnChangeMode.setText("模式" + mode);
 //                imageView.setMode(mode);
 //                mScale += 0.5f;
-//                imageView.scale(mScale);
-                imageView.drawNewRect(testPointList);
+                String scaleStr = etScale.getText().toString();
+                if (scaleStr == null || scaleStr.length() <= 0) {
+                    return;
+                }
+                float scale = Float.valueOf(scaleStr);
+                imageView.scale(scale, 1);
+//                imageView.drawNewRect(testPointList);
             }
         });
 
         btnMark.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isMarking) {
-                    btnMark.setText("开始标注");
-                    imageView.setDraw(false);
-                    isMarking = false;
-                } else {
-                    btnMark.setText("结束标注");
-                    imageView.setDraw(true);
-                    isMarking = true;
+//                if (isMarking) {
+//                    btnMark.setText("开始标注");
+//                    imageView.setDraw(false);
+//                    isMarking = false;
+//                } else {
+//                    btnMark.setText("结束标注");
+//                    imageView.setDraw(true);
+//                    isMarking = true;
+//                }
+                String scaleStr = etScale.getText().toString();
+                if (scaleStr == null || scaleStr.length() <= 0) {
+                    return;
                 }
+                float scale = Float.valueOf(scaleStr);
+                imageView.scale(scale, 2);
             }
         });
 
-        findViewById(R.id.btn_click).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_click2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                imageView.translate(100, 100);
-                imageView.revokeRect();
+                String xStr = etTransX.getText().toString();
+                String yStr = etTransY.getText().toString();
+                if (xStr == null || xStr.length() <= 0) {
+                    return;
+                }
+                if (yStr == null || yStr.length() <= 0) {
+                    return;
+                }
+                float transX = Float.valueOf(xStr);
+                float transY = Float.valueOf(xStr);
+                imageView.translate(transX, transY);
+//                imageView.revokeRect();
             }
         });
 
         imageView.setDrawInfoListener(new CustomImageView.DrawInfoListener() {
             @Override
             public void onDraw(String info, List<DimensionPoint> data) {
-                tvInfo.setText(info);
                 dimensionPointList.clear();
                 if (data == null || data.isEmpty()) {
                     rlPointInfo.setVisibility(View.GONE);
@@ -144,6 +169,20 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "click view , hide bar", Toast.LENGTH_SHORT).show();
+            }
+        });
+        CheckBox cbScale = findViewById(R.id.cb_scale);
+        cbScale.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                imageView.setCanScale(b);
+            }
+        });
+        CheckBox cbTranslate = findViewById(R.id.cb_translate);
+        cbTranslate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                imageView.setCanTranslate(b);
             }
         });
     }
@@ -196,36 +235,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        float eventX = motionEvent.getX();
-        float eventY = motionEvent.getY();
-        float[] eventXY = new float[]{eventX, eventY};
-
-        Matrix invertMatrix = new Matrix();
-        ((ImageView) view).getImageMatrix().invert(invertMatrix);
-
-        invertMatrix.mapPoints(eventXY);
-        int x = Integer.valueOf((int) eventXY[0]);
-        int y = Integer.valueOf((int) eventXY[1]);
-
-        Drawable imgDrawable = ((ImageView) view).getDrawable();
-        Bitmap bitmap = ((BitmapDrawable) imgDrawable).getBitmap();
-
-        String info = "触摸[" + eventX + "," + eventY + "] 图像[" + x + "," + y + "] " + " 大小[" + bitmap.getWidth() + "," + bitmap.getHeight() + "]";
-
-        //Limit x, y range within bitmap
-        if (x < 0) {
-            x = 0;
-        } else if (x > bitmap.getWidth() - 1) {
-            x = bitmap.getWidth() - 1;
-        }
-
-        if (y < 0) {
-            y = 0;
-        } else if (y > bitmap.getHeight() - 1) {
-            y = bitmap.getHeight() - 1;
-        }
-        info += " 图内[" + x + "," + y + "]";
-        tvInfo.setText(info);
         return true;
     }
 }
