@@ -63,8 +63,6 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
     private boolean isScaling = false;
     private float horizontalOffSet = 0;//横向滑动距离
     private float verticalOffSet = 0;//纵向滑动距离
-    private float totalHorizontalOffSet = 0;//纵向滑动距离
-    private float totalVerticalOffSet = 0;//纵向滑动距离
     private RectF baseRect = new RectF();//图像坐标系，用于基础位置偏移计算
     private RectF imgRect = new RectF();//图像坐标系，用于移动缩放边距判断
     private RectF scrollRect = new RectF();//图像坐标系，用于移动缩放边距判断
@@ -87,6 +85,7 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
     private boolean isCanScale = true;
     private boolean isCanTranslate = true;
     private int scaleType = 1;
+    private boolean isTest = true;
 
     public CustomImageView(Context context) {
         super(context);
@@ -117,7 +116,6 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
         Log.d("ufly", "setFileImage DisplayMetrics density=" + dm.density);
 
         this.filePath = filePath;
-        imgWidth = viewWidth;//横向宽度铺满
         int originalWidth = 0;
         int originalHeight = 0;
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -128,11 +126,12 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
         options.inJustDecodeBounds = false;
         Log.d("ufly", "setFileImage DisplayMetrics originalWidth=" + originalWidth + " originalHeight=" + originalHeight);
 
-        proportion = (float) imgWidth / (float) originalWidth;
-        imgHeight = (int) (originalHeight * proportion);
-
-//        Bitmap originalBitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-//        finalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, imgWidth, imgHeight);
+        double proportionW = (float) viewWidth / (float) originalWidth;
+        double proportionH = (float) viewHeight / (float) originalHeight;
+        proportion = Math.max(proportionW, proportionH);
+        imgWidth = proportionW > proportionH ? viewWidth : (int) (originalWidth * proportion);
+        imgHeight = proportionH > proportionW ? viewHeight : (int) (originalHeight * proportion);
+        Log.d("ufly", "setFileImage DisplayMetrics imgWidth=" + imgWidth + " imgHeight=" + imgHeight);
 
         Bitmap originalBitmap = BitmapFactory.decodeFile(filePath).copy(Bitmap.Config.ARGB_8888, true);
         baseBitmap = Bitmap.createScaledBitmap(originalBitmap, imgWidth, imgHeight, true);
@@ -158,69 +157,54 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
         //消除锯齿
         canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
         canvas.save();
-        if (baseBitmap != null) {
-            //标注模式才绘制矩形
-            if (isDraw) {
-//                canvas.scale(mScale, mScale, (float) viewWidth / 2, (float) viewHeight / 2);
+        if (isTest) {
+            if (paint == null) {
+                paint = new Paint();
+                paint.setStyle(Paint.Style.FILL);
+                paint.setAntiAlias(true);
+                paint.setColor(paintColor);
+                paint.setStrokeWidth(strokeWidth);
+            }
+            paint.setColor(Color.YELLOW);
+            canvas.drawRect(0, 0, 200, 200, paint);
+
+            Log.d("ufly", "onDraw ---------------------------mScale=" + mScale + " horizontalOffSet=" + horizontalOffSet + " verticalOffSet=" + verticalOffSet);
+            if (isScale) {
+                Log.d("ufly", "onDraw ---------------------------scale mScale=" + mScale + " scaleType=" + scaleType);
+                canvas.translate(translateX, translateY);
                 canvas.scale(mScale, mScale);
-                canvas.translate(imgRect.left, imgRect.top);
-                canvas.drawBitmap(drawRect(), getMatrix(), null);
-            } else {
-                if (isTranslate) {
-                    Log.d("ufly", "onDraw start--------------------------- isTranslate translateX=" + translateX + " translateY=" + translateY);
+                paint.setColor(Color.RED);
+                canvas.drawRect(0, 0, 200, 200, paint);
+            } else if (isTranslate) {
+                Log.d("ufly", "onDraw ---------------------------translate mScale=" + mScale);
+                canvas.translate(translateX, translateY);
+                canvas.scale(mScale, mScale);
+                paint.setColor(Color.GREEN);
+                canvas.drawRect(0, 0, 200, 200, paint);
+            }
+
+            Paint paint1 = new Paint();
+            paint1.setColor(paintColor1);
+            paint1.setStyle(Paint.Style.FILL);
+            canvas.drawCircle((float) viewWidth / 2, (float) viewHeight / 2, 5, paint1);
+        } else {
+            if (baseBitmap != null) {
+                //标注模式才绘制矩形
+                if (isDraw) {
                     canvas.scale(mScale, mScale);
-                    canvas.translate(translateX, translateY);
-                    canvas.drawBitmap(finalBitmap, getMatrix(), null);
-                } else if (mode == 1) {
-                    drawBitmap(canvas);
+                    canvas.translate(imgRect.left, imgRect.top);
+                    canvas.drawBitmap(drawRect(), getMatrix(), null);
                 } else {
-                    canvas.translate(horizontalOffSet, verticalOffSet);
-//                    canvas.scale(mScale, mScale, (float) viewWidth / 2, (float) viewHeight / 2);
-                    canvas.scale(mScale, mScale);
-                    canvas.drawBitmap(finalBitmap, getMatrix(), null);
+                    if (mode == 1) {
+                        drawBitmap(canvas);
+                    } else {
+                        canvas.translate(horizontalOffSet, verticalOffSet);
+                        canvas.scale(mScale, mScale);
+                        canvas.drawBitmap(finalBitmap, getMatrix(), null);
+                    }
                 }
             }
         }
-
-        //test
-       /* if (paint == null) {
-            paint = new Paint();
-            paint.setStyle(Paint.Style.FILL);
-            paint.setAntiAlias(true);
-            paint.setColor(paintColor);
-            paint.setStrokeWidth(strokeWidth);
-        }
-        paint.setColor(Color.YELLOW);
-        canvas.drawRect(0, 0, 200, 200, paint);
-
-        Log.d("ufly", "onDraw ---------------------------mScale=" + mScale + " horizontalOffSet=" + horizontalOffSet + " verticalOffSet=" + verticalOffSet);
-        if (isScale) {
-            Log.d("ufly", "onDraw ---------------------------scale mScale=" + mScale + " scaleType=" + scaleType);
-            if (scaleType == 1) {
-//                canvas.translate(translateX * mScale, translateY * mScale);
-                canvas.translate(translateX, translateY);
-                canvas.scale(mScale, mScale,100,100);
-            } else {
-                canvas.scale(mScale, mScale,100,100);
-            }
-            paint.setColor(Color.RED);
-            canvas.drawRect(0, 0, 200, 200, paint);
-        } else if (isTranslate) {
-            Log.d("ufly", "onDraw ---------------------------translate mScale=" + mScale);
-            canvas.translate(translateX, translateY);
-            canvas.scale(mScale, mScale,100,100);
-//            canvas.translate(translateX * mScale, translateY * mScale);
-            paint.setColor(Color.GREEN);
-            canvas.drawRect(0, 0, 200, 200, paint);
-        }
-
-//        canvas.drawRect(0, 0, 200, 200, paint);
-
-        Paint paint1 = new Paint();
-        paint1.setColor(paintColor1);
-        paint1.setStyle(Paint.Style.FILL);
-        canvas.drawCircle((float) viewWidth / 2, (float) viewHeight / 2, 5, paint1);*/
-
 
         canvas.restore();
         isInit = false;
@@ -379,12 +363,6 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
 
             Log.d("ufly", "DRAG_MODE after horizontalOffSet=" + horizontalOffSet + " verticalOffSet=" + verticalOffSet + " isCanLeftScroll=" + isCanLeftScroll + " isCanRightScroll=" + isCanRightScroll + " isCanUpScroll=" + isCanUpScroll + " isCanDownScroll=" + isCanDownScroll);
 
-            totalHorizontalOffSet += horizontalOffSet;
-            totalVerticalOffSet += verticalOffSet;
-
-            Log.d("ufly", "DRAG_MODE totalHorizontalOffSet=" + totalHorizontalOffSet);
-            Log.d("ufly", "DRAG_MODE totalVerticalOffSet=" + totalVerticalOffSet);
-
             imgRect.left = imgRect.left + horizontalOffSet;
             imgRect.right = imgRect.right + horizontalOffSet;
             imgRect.top = imgRect.top + verticalOffSet;
@@ -393,22 +371,28 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
             Log.d("ufly", "DRAG_MODE after imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom);
             canvas.translate(imgRect.left, imgRect.top);
             canvas.scale(mScale, mScale);
-            canvas.drawBitmap(finalBitmap, getMatrix(), null);
+            canvas.drawBitmap(finalBitmap, 0, 0, null);
             Log.d("ufly", "DRAG_MODE after translate imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom);
         }
         //手势缩放——基于移动后的放缩
         else if (mCurrentMode == SCALE_MODE) {
             Log.d("ufly", "SCALE_MODE before imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom + " mScale=" + mScale + " mScaleFactor=" + mScaleFactor);
+            //缩放边距判断
+
+
             //根据坐标原点计算缩放后坐标
-            imgRect.right = (baseRect.right - Math.abs(imgRect.left)) * mScale;
-            imgRect.bottom = (baseRect.bottom - Math.abs(imgRect.top)) * mScale;
+            imgRect.right = (baseRect.right) * mScale - imgRect.left;
+            imgRect.bottom = (baseRect.bottom) * mScale - imgRect.top;
+
             Log.d("ufly", "SCALE_MODE after imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom + " imgWidth=" + imgWidth + " imgHeight=" + imgHeight);
             canvas.translate(imgRect.left, imgRect.top);
             canvas.scale(mScale, mScale);
-            canvas.drawBitmap(finalBitmap, getMatrix(), null);
+            canvas.drawBitmap(finalBitmap, 0, 0, null);
         } else {
             Log.d("ufly", "NORMAL_MODE after imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom + " \n");
-            canvas.drawBitmap(finalBitmap, getMatrix(), null);
+            canvas.translate(imgRect.left, imgRect.top);
+            canvas.scale(mScale, mScale);
+            canvas.drawBitmap(finalBitmap, 0, 0, null);
         }
     }
 
@@ -557,8 +541,6 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
             Log.d("ufly", "SCALE_MODE mScaleListener onScaleEnd----------");
             isScaling = false;
             mCurrentMode = SCALE_MODE;
-            totalVerticalOffSet = 0;
-            totalHorizontalOffSet = 0;
         }
     };
 
@@ -643,6 +625,14 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
 
     public void setCanTranslate(boolean canTranslate) {
         isCanTranslate = canTranslate;
+    }
+
+    public boolean isTest() {
+        return isTest;
+    }
+
+    public void setTest(boolean test) {
+        isTest = test;
     }
 }
 

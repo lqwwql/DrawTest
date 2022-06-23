@@ -9,6 +9,8 @@ public class DimensionPoint {
     private String createTime;
     private double proportion;
 
+    public DimensionPoint(){}
+
     public DimensionPoint(float leftTopX, float leftTopY, float rightBottomX, float rightBottomY, double proportion) {
         this.leftTopX = leftTopX;
         this.leftTopY = leftTopY;

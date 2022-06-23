@@ -18,6 +18,15 @@
             >
         </com.main.drawtest.CustomImageView>
 
+<!--        <RelativeLayout
+            android:id="@+id/rl_photo"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </RelativeLayout>-->
+
+
         <RelativeLayout
             android:id="@+id/rl_point_info"
             android:layout_alignParentRight="true"
@@ -75,7 +84,7 @@
             android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/btn_import"
             android:layout_marginLeft="5dp"
-            android:text="开始标注"
+            android:text="移动"
             android:background="#547D1B"
             android:layout_centerVertical="true"
             android:layout_width="70dp"
@@ -87,7 +96,7 @@
             android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/btn_mark"
             android:layout_marginLeft="5dp"
-            android:text="点击1"
+            android:text="缩放"
             android:background="#547D1B"
             android:layout_centerVertical="true"
             android:layout_width="70dp"
@@ -99,7 +108,19 @@
             android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/btn_click1"
             android:layout_marginLeft="5dp"
-            android:text="点击2"
+            android:text="缩加"
+            android:background="#547D1B"
+            android:layout_centerVertical="true"
+            android:layout_width="70dp"
+            android:layout_height="40dp">
+        </Button>
+
+        <Button
+            android:id="@+id/btn_click3"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/btn_click2"
+            android:layout_marginLeft="5dp"
+            android:text="移加"
             android:background="#547D1B"
             android:layout_centerVertical="true"
             android:layout_width="70dp"
@@ -108,7 +129,7 @@
 
         <CheckBox
             android:id="@+id/cb_scale"
-            android:layout_toRightOf="@id/btn_click2"
+            android:layout_toRightOf="@id/btn_click3"
             android:layout_centerVertical="true"
             android:text="缩放"
             android:checked="true"
@@ -134,7 +155,8 @@
             android:id="@+id/et_trans_x"
             android:layout_toRightOf="@id/cb_translate"
             android:textColor="@color/black"
-            android:layout_width="50dp"
+            android:maxLines="1"
+            android:layout_width="70dp"
             android:text="100"
             android:layout_height="wrap_content">
 
@@ -144,8 +166,9 @@
             android:id="@+id/et_trans_y"
             android:layout_toRightOf="@id/et_trans_x"
             android:text="100"
+            android:maxLines="1"
             android:textColor="@color/black"
-            android:layout_width="50dp"
+            android:layout_width="70dp"
             android:layout_height="wrap_content">
 
         </EditText>
@@ -153,8 +176,9 @@
             android:id="@+id/et_scale"
             android:layout_toRightOf="@id/et_trans_y"
             android:textColor="@color/black"
+            android:maxLines="1"
             android:text="1.5"
-            android:layout_width="50dp"
+            android:layout_width="70dp"
             android:layout_height="wrap_content">
 
         </EditText>

@@ -45,4 +45,5 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     //图片浏览框架
     implementation 'com.bm.photoview:library:1.4.1'
+    api 'com.github.1993hzw:Androids:1.3'
 }

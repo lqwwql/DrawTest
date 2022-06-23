@@ -7,10 +7,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,7 +44,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     private final static int PHOTO_REQUEST_GALLERY = 10011;
     private CustomImageView imageView;
-    private Button btnMark, btnChangeMode;
+    //    private AdvancedDoodleView imageView;
+    private AdvancedDoodleView advancedDoodleView;
+    private Button btnMark, click1;
     private boolean isMarking = false;
     private int mode = 1;
     private ListView lvPoints;
@@ -50,8 +54,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     private List<DimensionPoint> dimensionPointList;
     private List<DimensionPoint> testPointList;
     private RelativeLayout rlPointInfo;
+    private RelativeLayout rlPhoto;
     private EditText etTransX, etTransY, etScale;
     private float mScale = 2f;
+    private boolean isTest = true;
+    private CheckBox cbScale, cbTranslate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +68,15 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        AppConstant.ScreenWidth = dm.widthPixels;
+        AppConstant.ScreenHeight = dm.heightPixels;
+
         imageView = findViewById(R.id.iv_photo);
+        rlPointInfo = findViewById(R.id.rl_point_info);
+//        rlPhoto = findViewById(R.id.rl_photo);
         btnMark = findViewById(R.id.btn_mark);
-        btnChangeMode = findViewById(R.id.btn_click1);
+        click1 = findViewById(R.id.btn_click1);
         lvPoints = findViewById(R.id.lv_points);
         etTransX = findViewById(R.id.et_trans_x);
         etTransY = findViewById(R.id.et_trans_y);
@@ -77,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         findViewById(R.id.btn_import).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isTest = !isTest;
+                imageView.setTest(isTest);
                 Matisse.from(MainActivity.this)
                         .choose(MimeType.ofImage())
                         .capture(true)
@@ -90,27 +105,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
-//        btnChangeMode.setText("模式" + mode);
-        btnChangeMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                if (mode == 1) {
-//                    mode = 2;
-//                } else {
-//                    mode = 1;
-//                }
-//                btnChangeMode.setText("模式" + mode);
-//                imageView.setMode(mode);
-//                mScale += 0.5f;
-                String scaleStr = etScale.getText().toString();
-                if (scaleStr == null || scaleStr.length() <= 0) {
-                    return;
-                }
-                float scale = Float.valueOf(scaleStr);
-                imageView.scale(scale, 1);
-//                imageView.drawNewRect(testPointList);
-            }
-        });
 
         btnMark.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,16 +118,61 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 //                    imageView.setDraw(true);
 //                    isMarking = true;
 //                }
+                String xStr = etTransX.getText().toString();
+                String yStr = etTransY.getText().toString();
+                if (xStr == null || xStr.length() <= 0) {
+                    return;
+                }
+                if (yStr == null || yStr.length() <= 0) {
+                    return;
+                }
+                float transX = Float.valueOf(xStr);
+                float transY = Float.valueOf(xStr);
+                imageView.translate(transX, transY);
+            }
+        });
+
+        click1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                if (mode == 1) {
+//                    mode = 2;
+//                } else {
+//                    mode = 1;
+//                }
+//                click1.setText("模式" + mode);
+//                imageView.setMode(mode);
+//                mScale += 0.5f;
                 String scaleStr = etScale.getText().toString();
                 if (scaleStr == null || scaleStr.length() <= 0) {
                     return;
                 }
                 float scale = Float.valueOf(scaleStr);
-                imageView.scale(scale, 2);
+                imageView.scale(scale, 1);
+//                imageView.drawNewRect(testPointList);
             }
         });
 
         findViewById(R.id.btn_click2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String scaleStr = etScale.getText().toString();
+                if (scaleStr == null || scaleStr.length() <= 0) {
+                    return;
+                }
+                float scale = Float.valueOf(scaleStr);
+                if (cbScale.isChecked()) {
+                    scale += 0.5;
+                } else {
+                    scale -= 0.5;
+                }
+
+                etScale.setText(String.valueOf(scale));
+//                imageView.revokeRect();
+            }
+        });
+
+        findViewById(R.id.btn_click3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String xStr = etTransX.getText().toString();
@@ -146,8 +185,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 }
                 float transX = Float.valueOf(xStr);
                 float transY = Float.valueOf(xStr);
-                imageView.translate(transX, transY);
-//                imageView.revokeRect();
+                if (cbTranslate.isChecked()) {
+                    transX += 100;
+                    transY += 100;
+                } else {
+                    transX -= 100;
+                    transY -= 100;
+                }
+
+                etTransX.setText(String.valueOf(transX));
+                etTransY.setText(String.valueOf(transY));
             }
         });
 
@@ -171,14 +218,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 Toast.makeText(MainActivity.this, "click view , hide bar", Toast.LENGTH_SHORT).show();
             }
         });
-        CheckBox cbScale = findViewById(R.id.cb_scale);
+        cbScale = findViewById(R.id.cb_scale);
         cbScale.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 imageView.setCanScale(b);
             }
         });
-        CheckBox cbTranslate = findViewById(R.id.cb_translate);
+        cbTranslate = findViewById(R.id.cb_translate);
         cbTranslate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -229,6 +276,25 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 //                        .load(photoList.get(0))
 //                        .into(imageView);
                 imageView.setFileImage(photoList.get(0));
+//                Bitmap bitmap = BitmapFactory.decodeFile(photoList.get(0)).copy(Bitmap.Config.ARGB_8888, true);
+//                advancedDoodleView = new AdvancedDoodleView(this, bitmap);
+//                advancedDoodleView.setDrawInfoListener(new AdvancedDoodleView.DrawInfoListener() {
+//                    @Override
+//                    public void onDraw(List<DimensionPoint> data) {
+//                        dimensionPointList.clear();
+//                        if (data == null || data.isEmpty()) {
+//                            rlPointInfo.setVisibility(View.GONE);
+//                        } else {
+//                            rlPointInfo.setVisibility(View.VISIBLE);
+//                            dimensionPointList.addAll(data);
+//                        }
+//                        pointsAdapter.notifyDataSetChanged();
+//                    }
+//                });
+//                if (rlPhoto.getChildAt(0) instanceof AdvancedDoodleView) {
+//                    rlPhoto.removeViewAt(0);
+//                }
+//                rlPhoto.addView(advancedDoodleView);
             }
         }
     }
