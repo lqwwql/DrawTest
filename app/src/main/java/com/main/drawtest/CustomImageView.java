@@ -40,8 +40,6 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
     private final int SCALE_MODE = 103;
     private boolean isDraw = false;//是否标注模式
     private float clickX = 0, clickY = 0, startX = 0, startY = 0;
-    private float baseX, baseY;//画布坐标系原点，可变化
-    private float baseScaleX, baseScaleY;//缩放中心点，可变化
     private Paint paint;//画笔
     private int paintColor = Color.RED;//画笔颜色
     private int paintColor1 = Color.BLACK;//画笔颜色
@@ -64,7 +62,7 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
     private float horizontalOffSet = 0;//横向滑动距离
     private float verticalOffSet = 0;//纵向滑动距离
     private RectF baseRect = new RectF();//图像坐标系，用于基础位置偏移计算
-    private RectF imgRect = new RectF();//图像坐标系，用于移动缩放边距判断
+    private RectF imgRect = new RectF();//基于屏幕坐标系，用于移动缩放边距判断
     private RectF scrollRect = new RectF();//图像坐标系，用于移动缩放边距判断
 
     private int mode = 1;
@@ -75,17 +73,21 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
 
     private float translateX = 0;
     private float translateY = 0;
+    private float scaleX = 0;
+    private float scaleY = 0;
     private boolean isTranslate = false;
     private boolean isScale = false;
 
     private float mScaleFactor = 1.0f;
-    private boolean isInit = true;
     private boolean isRevoke = false;
     private boolean isMoving = false;
     private boolean isCanScale = true;
     private boolean isCanTranslate = true;
     private int scaleType = 1;
     private boolean isTest = true;
+
+    boolean isCanRightScale = true;
+
 
     public CustomImageView(Context context) {
         super(context);
@@ -140,8 +142,6 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
         imgRect.set(0, 0, imgWidth, imgHeight);
         baseRect.set(0, 0, imgWidth, imgHeight);
         scrollRect.set(0, 0, imgWidth, imgHeight);
-        baseX = 0;
-        baseY = 0;
         originalBitmap.recycle();
         System.gc();
     }
@@ -172,13 +172,13 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
             if (isScale) {
                 Log.d("ufly", "onDraw ---------------------------scale mScale=" + mScale + " scaleType=" + scaleType);
                 canvas.translate(translateX, translateY);
-                canvas.scale(mScale, mScale);
+                canvas.scale(mScale, mScale, translateX, translateY);
                 paint.setColor(Color.RED);
                 canvas.drawRect(0, 0, 200, 200, paint);
             } else if (isTranslate) {
                 Log.d("ufly", "onDraw ---------------------------translate mScale=" + mScale);
                 canvas.translate(translateX, translateY);
-                canvas.scale(mScale, mScale);
+                canvas.scale(mScale, mScale, translateX, translateY);
                 paint.setColor(Color.GREEN);
                 canvas.drawRect(0, 0, 200, 200, paint);
             }
@@ -207,7 +207,6 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
         }
 
         canvas.restore();
-        isInit = false;
         isScale = false;
         isTranslate = false;
         isRevoke = false;
@@ -369,31 +368,49 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
             imgRect.bottom = imgRect.bottom + verticalOffSet;
 
             Log.d("ufly", "DRAG_MODE after imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom);
-            canvas.translate(imgRect.left, imgRect.top);
-            canvas.scale(mScale, mScale);
-            canvas.drawBitmap(finalBitmap, 0, 0, null);
-            Log.d("ufly", "DRAG_MODE after translate imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom);
         }
         //手势缩放——基于移动后的放缩
         else if (mCurrentMode == SCALE_MODE) {
             Log.d("ufly", "SCALE_MODE before imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom + " mScale=" + mScale + " mScaleFactor=" + mScaleFactor);
             //缩放边距判断
+            if (imgRect.left < 0) {
+                isCanRightScroll = true;
+            }
+            if (imgRect.top < 0) {
+                isCanDownScroll = true;
+            }
 
+            boolean isEnd = false;
+            float rightScale = mScaleFactor, bottomScale = mScaleFactor;
+            //右缩放边界
+            if (imgRect.right != viewWidth && baseRect.right * mScale * mScaleFactor + imgRect.left < viewWidth) {
+                rightScale = (baseRect.right) * mScale + imgRect.left / (float) viewWidth;
+                isEnd = true;
+                imgRect.right = viewWidth;
+                isCanRightScale = false;
+            }
+            //下缩放边界
+            if (baseRect.bottom * mScale * mScaleFactor + imgRect.top < viewHeight) {
+                bottomScale = (baseRect.bottom) * mScale + imgRect.top / (float) viewHeight;
+                isEnd = true;
+            }
+
+            if (isEnd) {
+                mScaleFactor = Math.min(rightScale, bottomScale);
+            }
 
             //根据坐标原点计算缩放后坐标
-            imgRect.right = (baseRect.right) * mScale - imgRect.left;
-            imgRect.bottom = (baseRect.bottom) * mScale - imgRect.top;
+            mScale *= mScaleFactor;
+            if (isCanRightScale) {
+                imgRect.right = (baseRect.right) * mScale + imgRect.left;
+            }
+            imgRect.bottom = (baseRect.bottom) * mScale + imgRect.top;
 
             Log.d("ufly", "SCALE_MODE after imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom + " imgWidth=" + imgWidth + " imgHeight=" + imgHeight);
-            canvas.translate(imgRect.left, imgRect.top);
-            canvas.scale(mScale, mScale);
-            canvas.drawBitmap(finalBitmap, 0, 0, null);
-        } else {
-            Log.d("ufly", "NORMAL_MODE after imgRect left=" + imgRect.left + " top=" + imgRect.top + " right=" + imgRect.right + " bottom=" + imgRect.bottom + " \n");
-            canvas.translate(imgRect.left, imgRect.top);
-            canvas.scale(mScale, mScale);
-            canvas.drawBitmap(finalBitmap, 0, 0, null);
         }
+        canvas.translate(imgRect.left, imgRect.top);
+        canvas.scale(mScale, mScale, scaleX, scaleY);
+        canvas.drawBitmap(finalBitmap, 0, 0, null);
     }
 
     /**
@@ -514,16 +531,7 @@ public class CustomImageView extends androidx.appcompat.widget.AppCompatImageVie
             float scaleFactor = detector.getScaleFactor();
             if (Float.isNaN(scaleFactor) || Float.isInfinite(scaleFactor))
                 return false;
-            if (mScale * scaleFactor > 3) {
-                return true;
-            }
-            mScale *= scaleFactor;
             mScaleFactor = scaleFactor;
-            if (mScale < 1.0f) {
-                mScale = 1.0f;
-                invalidate();
-                return true;
-            }
             invalidate();
             Log.d("ufly", "SCALE_MODE mScaleListener onScale mScaleFactor=" + mScaleFactor + " mScale=" + mScale);
             return true;
